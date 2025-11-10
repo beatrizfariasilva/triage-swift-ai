@@ -43,11 +43,12 @@ All colors MUST be HSL.
 
     --radius: 0.75rem;
     
-    /* Triage classification colors */
-    --emergency: 0 84% 60%;
-    --urgent: 45 93% 47%;
-    --low-priority: 150 60% 50%;
-    --non-urgent: 210 80% 48%;
+    /* Manchester Protocol Colors */
+    --red-emergency: 0 85% 60%;
+    --orange-very-urgent: 25 95% 53%;
+    --yellow-urgent: 48 96% 53%;
+    --green-low-urgent: 142 76% 36%;
+    --blue-non-urgent: 221 83% 53%;
     
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(210 80% 48%), hsl(210 70% 58%));
@@ -108,10 +109,12 @@ All colors MUST be HSL.
     --input: 215 20% 22%;
     --ring: 210 80% 55%;
     
-    --emergency: 0 84% 65%;
-    --urgent: 45 93% 52%;
-    --low-priority: 150 60% 50%;
-    --non-urgent: 210 80% 55%;
+    /* Manchester Protocol Colors */
+    --red-emergency: 0 85% 60%;
+    --orange-very-urgent: 25 95% 53%;
+    --yellow-urgent: 48 96% 53%;
+    --green-low-urgent: 142 76% 36%;
+    --blue-non-urgent: 221 83% 53%;
     
     --gradient-primary: linear-gradient(135deg, hsl(210 80% 55%), hsl(210 70% 65%));
     --gradient-secondary: linear-gradient(135deg, hsl(150 60% 45%), hsl(150 55% 55%));

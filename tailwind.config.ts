@@ -47,10 +47,13 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        emergency: "hsl(var(--emergency))",
-        urgent: "hsl(var(--urgent))",
-        "low-priority": "hsl(var(--low-priority))",
-        "non-urgent": "hsl(var(--non-urgent))",
+        manchester: {
+          red: "hsl(var(--red-emergency))",
+          orange: "hsl(var(--orange-very-urgent))",
+          yellow: "hsl(var(--yellow-urgent))",
+          green: "hsl(var(--green-low-urgent))",
+          blue: "hsl(var(--blue-non-urgent))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

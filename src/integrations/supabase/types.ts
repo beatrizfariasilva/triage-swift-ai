@@ -14,7 +14,104 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          created_at: string | null
+          full_name: string
+          id: string
+          role: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          full_name: string
+          id: string
+          role: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          full_name?: string
+          id?: string
+          role?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      triage_records: {
+        Row: {
+          blood_pressure: string | null
+          classification: string
+          created_at: string | null
+          heart_rate: number | null
+          id: string
+          observations: string | null
+          oxygen_saturation: number | null
+          pain_level: number | null
+          patient_birth_date: string
+          patient_cpf: string
+          patient_gender: string
+          patient_name: string
+          patient_phone: string | null
+          status: string | null
+          symptoms: string
+          temperature: number | null
+          triage_professional_id: string | null
+          updated_at: string | null
+          wait_time_minutes: number | null
+        }
+        Insert: {
+          blood_pressure?: string | null
+          classification: string
+          created_at?: string | null
+          heart_rate?: number | null
+          id?: string
+          observations?: string | null
+          oxygen_saturation?: number | null
+          pain_level?: number | null
+          patient_birth_date: string
+          patient_cpf: string
+          patient_gender: string
+          patient_name: string
+          patient_phone?: string | null
+          status?: string | null
+          symptoms: string
+          temperature?: number | null
+          triage_professional_id?: string | null
+          updated_at?: string | null
+          wait_time_minutes?: number | null
+        }
+        Update: {
+          blood_pressure?: string | null
+          classification?: string
+          created_at?: string | null
+          heart_rate?: number | null
+          id?: string
+          observations?: string | null
+          oxygen_saturation?: number | null
+          pain_level?: number | null
+          patient_birth_date?: string
+          patient_cpf?: string
+          patient_gender?: string
+          patient_name?: string
+          patient_phone?: string | null
+          status?: string | null
+          symptoms?: string
+          temperature?: number | null
+          triage_professional_id?: string | null
+          updated_at?: string | null
+          wait_time_minutes?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "triage_records_triage_professional_id_fkey"
+            columns: ["triage_professional_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

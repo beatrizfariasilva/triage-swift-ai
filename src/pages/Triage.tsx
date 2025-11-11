@@ -30,8 +30,8 @@ const Triage = () => {
     symptoms: "",
     painLevel: "",
     observations: "",
-    classification: "yellow" as "red" | "orange" | "yellow" | "green" | "blue",
   });
+  const [classifying, setClassifying] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -63,6 +63,7 @@ const Triage = () => {
     }
 
     setLoading(true);
+    setClassifying(true);
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -72,13 +73,39 @@ const Triage = () => {
         return;
       }
 
+      // Classify using AI
+      toast.info("Analisando dados do paciente...");
+      const { data: classificationData, error: classificationError } = await supabase.functions.invoke(
+        'classify-triage',
+        {
+          body: {
+            patientData,
+            vitalSigns,
+            symptoms: clinicalData.symptoms,
+            painLevel: clinicalData.painLevel,
+          }
+        }
+      );
+
+      if (classificationError) {
+        console.error("Classification error:", classificationError);
+        toast.error("Erro ao classificar triagem. Tente novamente.");
+        return;
+      }
+
+      const classification = classificationData.classification;
+      setClassifying(false);
+      
+      toast.success(`Classificação: ${getClassificationLabel(classification)}`);
+
+      // Insert triage record
       const { error } = await supabase.from("triage_records").insert({
         patient_name: patientData.name,
         patient_cpf: patientData.cpf,
         patient_birth_date: patientData.birthDate,
         patient_gender: patientData.gender,
         patient_phone: patientData.phone || null,
-        classification: clinicalData.classification,
+        classification: classification,
         blood_pressure: vitalSigns.bloodPressure,
         heart_rate: parseInt(vitalSigns.heartRate),
         oxygen_saturation: parseInt(vitalSigns.oxygenSaturation),
@@ -97,7 +124,19 @@ const Triage = () => {
       toast.error(error.message || "Erro ao registrar triagem");
     } finally {
       setLoading(false);
+      setClassifying(false);
     }
+  };
+
+  const getClassificationLabel = (classification: string) => {
+    const labels = {
+      red: "Vermelho - Emergência",
+      orange: "Laranja - Muito Urgente",
+      yellow: "Amarelo - Urgente",
+      green: "Verde - Pouco Urgente",
+      blue: "Azul - Não Urgente",
+    };
+    return labels[classification as keyof typeof labels];
   };
 
   const getClassificationColor = (classification: string) => {
@@ -252,50 +291,6 @@ const Triage = () => {
                 <h3 className="font-semibold text-lg border-b pb-2">Avaliação Clínica</h3>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="classification">Classificação de Manchester *</Label>
-                  <Select
-                    value={clinicalData.classification}
-                    onValueChange={(value: any) => setClinicalData({ ...clinicalData, classification: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="red">
-                        <div className="flex items-center gap-2">
-                          <div className={`w-4 h-4 rounded-full ${getClassificationColor("red")}`}></div>
-                          Vermelho - Emergência
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="orange">
-                        <div className="flex items-center gap-2">
-                          <div className={`w-4 h-4 rounded-full ${getClassificationColor("orange")}`}></div>
-                          Laranja - Muito Urgente
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="yellow">
-                        <div className="flex items-center gap-2">
-                          <div className={`w-4 h-4 rounded-full ${getClassificationColor("yellow")}`}></div>
-                          Amarelo - Urgente
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="green">
-                        <div className="flex items-center gap-2">
-                          <div className={`w-4 h-4 rounded-full ${getClassificationColor("green")}`}></div>
-                          Verde - Pouco Urgente
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="blue">
-                        <div className="flex items-center gap-2">
-                          <div className={`w-4 h-4 rounded-full ${getClassificationColor("blue")}`}></div>
-                          Azul - Não Urgente
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
                   <Label htmlFor="painLevel">Nível de Dor (0-10)</Label>
                   <Input
                     id="painLevel"
@@ -330,6 +325,14 @@ const Triage = () => {
                     rows={3}
                   />
                 </div>
+
+                {classifying && (
+                  <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 text-center">
+                    <p className="text-sm text-foreground">
+                      🤖 IA analisando sinais vitais e sintomas para classificação segundo Protocolo de Manchester...
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div className="flex gap-3 pt-4">
@@ -345,9 +348,9 @@ const Triage = () => {
                 <Button
                   type="submit"
                   className="flex-1 bg-gradient-primary hover:opacity-90"
-                  disabled={loading}
+                  disabled={loading || classifying}
                 >
-                  {loading ? "Salvando..." : "Registrar Triagem"}
+                  {classifying ? "Classificando..." : loading ? "Salvando..." : "Classificar e Registrar"}
                 </Button>
               </div>
             </form>

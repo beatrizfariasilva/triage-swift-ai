@@ -3,20 +3,23 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Activity, LogOut, Plus, User, Filter } from "lucide-react";
+import { Activity, LogOut, Plus, User, Filter, UserCheck } from "lucide-react";
 import { toast } from "sonner";
 import { PatientDetailsDialog } from "@/components/PatientDetailsDialog";
 import { Footer } from "@/components/Footer";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
+import { Badge } from "@/components/ui/badge";
 
 type TriageRecord = {
   id: string;
   patient_name: string;
+  patient_cpf: string;
   classification: string;
   status: string;
   created_at: string;
   wait_time_minutes: number;
+  is_recurring?: boolean;
 };
 
 const TriageDashboard = () => {
@@ -71,7 +74,21 @@ const TriageDashboard = () => {
         (severityOrder[a.classification as keyof typeof severityOrder] || 5) - 
         (severityOrder[b.classification as keyof typeof severityOrder] || 5)
       );
-      setRecords(sorted);
+      
+      // Check if patients are recurring
+      const recordsWithHistory = await Promise.all(
+        sorted.map(async (record) => {
+          const { count } = await supabase
+            .from("triage_records")
+            .select("*", { count: "exact", head: true })
+            .eq("patient_cpf", record.patient_cpf)
+            .neq("id", record.id);
+          
+          return { ...record, is_recurring: (count || 0) > 0 };
+        })
+      );
+      
+      setRecords(recordsWithHistory);
     } else if (filterBy === "age") {
       const { data, error } = await query;
       if (error) {
@@ -84,7 +101,21 @@ const TriageDashboard = () => {
         const ageB = new Date().getFullYear() - new Date(b.patient_birth_date).getFullYear();
         return ageB - ageA; // Older first
       });
-      setRecords(sorted);
+      
+      // Check if patients are recurring
+      const recordsWithHistory = await Promise.all(
+        sorted.map(async (record) => {
+          const { count } = await supabase
+            .from("triage_records")
+            .select("*", { count: "exact", head: true })
+            .eq("patient_cpf", record.patient_cpf)
+            .neq("id", record.id);
+          
+          return { ...record, is_recurring: (count || 0) > 0 };
+        })
+      );
+      
+      setRecords(recordsWithHistory);
     } else {
       // Default: sort by created_at
       const { data, error } = await query.order("created_at", { ascending: false });
@@ -92,7 +123,21 @@ const TriageDashboard = () => {
         toast.error("Erro ao carregar triagens");
         return;
       }
-      setRecords(data || []);
+      
+      // Check if patients are recurring
+      const recordsWithHistory = await Promise.all(
+        (data || []).map(async (record) => {
+          const { count } = await supabase
+            .from("triage_records")
+            .select("*", { count: "exact", head: true })
+            .eq("patient_cpf", record.patient_cpf)
+            .neq("id", record.id);
+          
+          return { ...record, is_recurring: (count || 0) > 0 };
+        })
+      );
+      
+      setRecords(recordsWithHistory);
     }
   };
 
@@ -226,7 +271,15 @@ const TriageDashboard = () => {
               >
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">{record.patient_name}</CardTitle>
+                    <div className="flex items-center gap-2">
+                      <CardTitle className="text-lg">{record.patient_name}</CardTitle>
+                      {record.is_recurring && (
+                        <Badge variant="secondary" className="flex items-center gap-1">
+                          <UserCheck className="h-3 w-3" />
+                          Recorrente
+                        </Badge>
+                      )}
+                    </div>
                     <div className="flex items-center gap-2">
                       <span
                         className={`px-3 py-1 rounded-full text-white text-sm font-medium ${getClassificationColor(
@@ -260,7 +313,8 @@ const TriageDashboard = () => {
       <PatientDetailsDialog 
         patient={selectedPatient} 
         open={!!selectedPatient} 
-        onOpenChange={(open) => !open && setSelectedPatient(null)} 
+        onOpenChange={(open) => !open && setSelectedPatient(null)}
+        onStatusUpdate={fetchRecords}
       />
 
       <Footer />

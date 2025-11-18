@@ -1,15 +1,67 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { User, Calendar, Phone, Activity, Thermometer, Heart, Wind, AlertCircle, Clock, FileText } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { User, Calendar, Phone, Activity, Thermometer, Heart, Wind, AlertCircle, Clock, FileText, History } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useState, useEffect } from "react";
 
 type PatientDetailsProps = {
   patient: any;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onStatusUpdate?: () => void;
 };
 
-export const PatientDetailsDialog = ({ patient, open, onOpenChange }: PatientDetailsProps) => {
+export const PatientDetailsDialog = ({ patient, open, onOpenChange, onStatusUpdate }: PatientDetailsProps) => {
+  const [status, setStatus] = useState(patient?.status || "waiting");
+  const [patientHistory, setPatientHistory] = useState<any[]>([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+
+  useEffect(() => {
+    if (patient) {
+      setStatus(patient.status);
+      fetchPatientHistory();
+    }
+  }, [patient]);
+
+  const fetchPatientHistory = async () => {
+    if (!patient?.patient_cpf) return;
+    
+    setLoadingHistory(true);
+    const { data, error } = await supabase
+      .from("triage_records")
+      .select("*")
+      .eq("patient_cpf", patient.patient_cpf)
+      .neq("id", patient.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Erro ao buscar histórico:", error);
+    } else {
+      setPatientHistory(data || []);
+    }
+    setLoadingHistory(false);
+  };
+
+  const handleStatusUpdate = async (newStatus: string) => {
+    const { error } = await supabase
+      .from("triage_records")
+      .update({ status: newStatus })
+      .eq("id", patient.id);
+
+    if (error) {
+      toast.error("Erro ao atualizar status");
+      return;
+    }
+
+    setStatus(newStatus);
+    toast.success("Status atualizado com sucesso");
+    onStatusUpdate?.();
+  };
+
   if (!patient) return null;
 
   const getClassificationColor = (classification: string) => {
@@ -106,13 +158,24 @@ export const PatientDetailsDialog = ({ patient, open, onOpenChange }: PatientDet
           {/* Classification */}
           <div className="space-y-3">
             <h3 className="font-semibold text-lg border-b pb-2">Classificação e Status</h3>
-            <div className="flex gap-3">
+            <div className="flex gap-3 items-center">
               <Badge className={`${getClassificationColor(patient.classification)} text-white px-4 py-2 text-base`}>
                 {getClassificationLabel(patient.classification)}
               </Badge>
-              <Badge variant="outline" className="px-4 py-2 text-base">
-                {getStatusLabel(patient.status)}
-              </Badge>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Status:</span>
+                <Select value={status} onValueChange={handleStatusUpdate}>
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="waiting">Aguardando</SelectItem>
+                    <SelectItem value="in_care">Em Atendimento</SelectItem>
+                    <SelectItem value="pending_recheck">Aguardando Reavaliação</SelectItem>
+                    <SelectItem value="completed">Concluído</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Clock className="h-4 w-4" />
@@ -200,6 +263,53 @@ export const PatientDetailsDialog = ({ patient, open, onOpenChange }: PatientDet
                 </div>
               )}
             </div>
+          </div>
+
+          <Separator />
+
+          {/* Patient History */}
+          <div className="space-y-3">
+            <h3 className="font-semibold text-lg border-b pb-2 flex items-center gap-2">
+              <History className="h-5 w-5 text-primary" />
+              Histórico de Atendimentos
+            </h3>
+            {loadingHistory ? (
+              <p className="text-sm text-muted-foreground">Carregando histórico...</p>
+            ) : patientHistory.length === 0 ? (
+              <div className="p-4 bg-muted rounded-lg">
+                <p className="text-sm text-muted-foreground">
+                  <strong>Paciente Novo</strong> - Este é o primeiro atendimento do paciente no sistema.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  <strong>Paciente Recorrente</strong> - {patientHistory.length} atendimento(s) anterior(es):
+                </p>
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {patientHistory.map((record) => (
+                    <div key={record.id} className="p-3 bg-muted rounded-lg text-sm">
+                      <div className="flex justify-between items-start mb-1">
+                        <span className="font-medium">
+                          {new Date(record.created_at).toLocaleDateString("pt-BR")}
+                        </span>
+                        <Badge className={`${getClassificationColor(record.classification)} text-white text-xs`}>
+                          {getClassificationLabel(record.classification)}
+                        </Badge>
+                      </div>
+                      <p className="text-muted-foreground text-xs">
+                        Status: {getStatusLabel(record.status)}
+                      </p>
+                      {record.symptoms && (
+                        <p className="text-muted-foreground text-xs mt-1">
+                          Sintomas: {record.symptoms.substring(0, 100)}...
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </DialogContent>

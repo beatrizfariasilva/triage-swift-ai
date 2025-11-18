@@ -8,30 +8,78 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Activity, ArrowLeft } from "lucide-react";
+import { Activity, ArrowLeft, Undo2, Redo2 } from "lucide-react";
+import { useFormHistory } from "@/hooks/useFormHistory";
+import { Footer } from "@/components/Footer";
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
+import { cn } from "@/lib/utils";
 
 const Triage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [patientData, setPatientData] = useState({
-    name: "",
-    cpf: "",
-    birthDate: "",
-    gender: "",
-    phone: "",
-  });
-  const [vitalSigns, setVitalSigns] = useState({
-    bloodPressure: "",
-    heartRate: "",
-    oxygenSaturation: "",
-    temperature: "",
-  });
-  const [clinicalData, setClinicalData] = useState({
-    symptoms: "",
-    painLevel: "",
-    observations: "",
-  });
+  const [submittedOnce, setSubmittedOnce] = useState(false);
+  
+  const initialFormState = {
+    patientData: {
+      name: "",
+      cpf: "",
+      birthDate: "",
+      gender: "",
+      phone: "",
+    },
+    vitalSigns: {
+      bloodPressure: "",
+      heartRate: "",
+      oxygenSaturation: "",
+      temperature: "",
+    },
+    clinicalData: {
+      symptoms: "",
+      painLevel: "",
+      observations: "",
+    },
+  };
+
+  const formHistory = useFormHistory(initialFormState);
+  
+  const [patientData, setPatientData] = useState(formHistory.state.patientData);
+  const [vitalSigns, setVitalSigns] = useState(formHistory.state.vitalSigns);
+  const [clinicalData, setClinicalData] = useState(formHistory.state.clinicalData);
   const [classifying, setClassifying] = useState(false);
+
+  // Update form history when data changes
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      formHistory.pushState({
+        patientData,
+        vitalSigns,
+        clinicalData,
+      });
+    }, 500);
+    return () => clearTimeout(timeoutId);
+  }, [patientData, vitalSigns, clinicalData]);
+
+  const handleUndo = () => {
+    const prevState = formHistory.undo();
+    if (prevState) {
+      setPatientData(prevState.patientData);
+      setVitalSigns(prevState.vitalSigns);
+      setClinicalData(prevState.clinicalData);
+    }
+  };
+
+  const handleRedo = () => {
+    const nextState = formHistory.redo();
+    if (nextState) {
+      setPatientData(nextState.patientData);
+      setVitalSigns(nextState.vitalSigns);
+      setClinicalData(nextState.clinicalData);
+    }
+  };
+
+  const isFieldInvalid = (value: any) => {
+    return submittedOnce && (!value || value === "");
+  };
 
   useEffect(() => {
     checkAuth();
@@ -46,6 +94,7 @@ const Triage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmittedOnce(true);
 
     if (!patientData.name || !patientData.cpf || !patientData.birthDate || !patientData.gender) {
       toast.error("Por favor, preencha todos os dados do paciente");
@@ -151,20 +200,57 @@ const Triage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-4xl mx-auto py-8">
+    <div className="min-h-screen bg-background p-4 flex flex-col">
+      <div className="max-w-4xl mx-auto py-8 flex-1">
+        {/* Breadcrumb */}
+        <Breadcrumb className="mb-6">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/triage-dashboard">Dashboard</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Nova Triagem</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+
         <Card className="shadow-lg">
           <CardHeader>
-            <div className="flex items-center gap-4 mb-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => navigate("/triage-dashboard")}
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-              <div className="p-3 bg-gradient-primary rounded-full">
-                <Activity className="h-8 w-8 text-primary-foreground" />
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-4">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => navigate("/triage-dashboard")}
+                >
+                  <ArrowLeft className="h-5 w-5" />
+                </Button>
+                <div className="p-3 bg-gradient-primary rounded-full">
+                  <Activity className="h-8 w-8 text-primary-foreground" />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={handleUndo}
+                  disabled={!formHistory.canUndo || loading}
+                  title="Desfazer"
+                >
+                  <Undo2 className="h-4 w-4" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={handleRedo}
+                  disabled={!formHistory.canRedo || loading}
+                  title="Refazer"
+                >
+                  <Redo2 className="h-4 w-4" />
+                </Button>
               </div>
             </div>
             <CardTitle className="text-3xl font-bold">Nova Triagem</CardTitle>
@@ -184,6 +270,7 @@ const Triage = () => {
                       id="name"
                       value={patientData.name}
                       onChange={(e) => setPatientData({ ...patientData, name: e.target.value })}
+                      className={cn(isFieldInvalid(patientData.name) && "border-destructive")}
                       required
                     />
                   </div>
@@ -193,6 +280,7 @@ const Triage = () => {
                       id="cpf"
                       value={patientData.cpf}
                       onChange={(e) => setPatientData({ ...patientData, cpf: e.target.value })}
+                      className={cn(isFieldInvalid(patientData.cpf) && "border-destructive")}
                       required
                     />
                   </div>
@@ -203,6 +291,7 @@ const Triage = () => {
                       type="date"
                       value={patientData.birthDate}
                       onChange={(e) => setPatientData({ ...patientData, birthDate: e.target.value })}
+                      className={cn(isFieldInvalid(patientData.birthDate) && "border-destructive")}
                       required
                     />
                   </div>
@@ -212,13 +301,13 @@ const Triage = () => {
                       value={patientData.gender}
                       onValueChange={(value) => setPatientData({ ...patientData, gender: value })}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className={cn(isFieldInvalid(patientData.gender) && "border-destructive")}>
                         <SelectValue placeholder="Selecione" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="masculino">Masculino</SelectItem>
-                        <SelectItem value="feminino">Feminino</SelectItem>
-                        <SelectItem value="outro">Outro</SelectItem>
+                        <SelectItem value="male">Masculino</SelectItem>
+                        <SelectItem value="female">Feminino</SelectItem>
+                        <SelectItem value="other">Outro</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -244,6 +333,7 @@ const Triage = () => {
                       placeholder="120/80"
                       value={vitalSigns.bloodPressure}
                       onChange={(e) => setVitalSigns({ ...vitalSigns, bloodPressure: e.target.value })}
+                      className={cn(isFieldInvalid(vitalSigns.bloodPressure) && "border-destructive")}
                       required
                     />
                   </div>
@@ -255,6 +345,7 @@ const Triage = () => {
                       placeholder="75"
                       value={vitalSigns.heartRate}
                       onChange={(e) => setVitalSigns({ ...vitalSigns, heartRate: e.target.value })}
+                      className={cn(isFieldInvalid(vitalSigns.heartRate) && "border-destructive")}
                       required
                     />
                   </div>
@@ -268,6 +359,7 @@ const Triage = () => {
                       max="100"
                       value={vitalSigns.oxygenSaturation}
                       onChange={(e) => setVitalSigns({ ...vitalSigns, oxygenSaturation: e.target.value })}
+                      className={cn(isFieldInvalid(vitalSigns.oxygenSaturation) && "border-destructive")}
                       required
                     />
                   </div>
@@ -280,6 +372,7 @@ const Triage = () => {
                       placeholder="36.5"
                       value={vitalSigns.temperature}
                       onChange={(e) => setVitalSigns({ ...vitalSigns, temperature: e.target.value })}
+                      className={cn(isFieldInvalid(vitalSigns.temperature) && "border-destructive")}
                       required
                     />
                   </div>
@@ -310,6 +403,7 @@ const Triage = () => {
                     placeholder="Descreva os sintomas apresentados pelo paciente..."
                     value={clinicalData.symptoms}
                     onChange={(e) => setClinicalData({ ...clinicalData, symptoms: e.target.value })}
+                    className={cn(isFieldInvalid(clinicalData.symptoms) && "border-destructive")}
                     rows={4}
                     required
                   />
@@ -357,6 +451,7 @@ const Triage = () => {
           </CardContent>
         </Card>
       </div>
+      <Footer />
     </div>
   );
 };

@@ -10,6 +10,7 @@ import { Footer } from "@/components/Footer";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
 import { Badge } from "@/components/ui/badge";
+import { TextToSpeechButton } from "@/components/TextToSpeechButton";
 
 type TriageRecord = {
   id: string;
@@ -188,6 +189,7 @@ const TriageDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <TextToSpeechButton />
       {/* Header */}
       <header className="bg-card border-b border-border sticky top-0 z-10 shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">

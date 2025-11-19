@@ -13,6 +13,8 @@ import { useFormHistory } from "@/hooks/useFormHistory";
 import { Footer } from "@/components/Footer";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
 import { cn } from "@/lib/utils";
+import { TextToSpeechButton } from "@/components/TextToSpeechButton";
+import { VoiceInputButton } from "@/components/VoiceInputButton";
 
 const Triage = () => {
   const navigate = useNavigate();
@@ -266,23 +268,33 @@ const Triage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="name">Nome Completo *</Label>
-                    <Input
-                      id="name"
-                      value={patientData.name}
-                      onChange={(e) => setPatientData({ ...patientData, name: e.target.value })}
-                      className={cn(isFieldInvalid(patientData.name) && "border-destructive")}
-                      required
-                    />
+                    <div className="flex gap-2">
+                      <Input
+                        id="name"
+                        value={patientData.name}
+                        onChange={(e) => setPatientData({ ...patientData, name: e.target.value })}
+                        className={cn(isFieldInvalid(patientData.name) && "border-destructive")}
+                        required
+                      />
+                      <VoiceInputButton 
+                        onTranscript={(text) => setPatientData({ ...patientData, name: text })}
+                      />
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="cpf">CPF *</Label>
-                    <Input
-                      id="cpf"
-                      value={patientData.cpf}
-                      onChange={(e) => setPatientData({ ...patientData, cpf: e.target.value })}
-                      className={cn(isFieldInvalid(patientData.cpf) && "border-destructive")}
-                      required
-                    />
+                    <div className="flex gap-2">
+                      <Input
+                        id="cpf"
+                        value={patientData.cpf}
+                        onChange={(e) => setPatientData({ ...patientData, cpf: e.target.value })}
+                        className={cn(isFieldInvalid(patientData.cpf) && "border-destructive")}
+                        required
+                      />
+                      <VoiceInputButton 
+                        onTranscript={(text) => setPatientData({ ...patientData, cpf: text })}
+                      />
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="birthDate">Data de Nascimento *</Label>
@@ -313,11 +325,16 @@ const Triage = () => {
                   </div>
                   <div className="space-y-2 md:col-span-2">
                     <Label htmlFor="phone">Telefone</Label>
-                    <Input
-                      id="phone"
-                      value={patientData.phone}
-                      onChange={(e) => setPatientData({ ...patientData, phone: e.target.value })}
-                    />
+                    <div className="flex gap-2">
+                      <Input
+                        id="phone"
+                        value={patientData.phone}
+                        onChange={(e) => setPatientData({ ...patientData, phone: e.target.value })}
+                      />
+                      <VoiceInputButton 
+                        onTranscript={(text) => setPatientData({ ...patientData, phone: text })}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -328,14 +345,19 @@ const Triage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="bloodPressure">Pressão Arterial (mmHg) *</Label>
-                    <Input
-                      id="bloodPressure"
-                      placeholder="120/80"
-                      value={vitalSigns.bloodPressure}
-                      onChange={(e) => setVitalSigns({ ...vitalSigns, bloodPressure: e.target.value })}
-                      className={cn(isFieldInvalid(vitalSigns.bloodPressure) && "border-destructive")}
-                      required
-                    />
+                    <div className="flex gap-2">
+                      <Input
+                        id="bloodPressure"
+                        placeholder="120/80"
+                        value={vitalSigns.bloodPressure}
+                        onChange={(e) => setVitalSigns({ ...vitalSigns, bloodPressure: e.target.value })}
+                        className={cn(isFieldInvalid(vitalSigns.bloodPressure) && "border-destructive")}
+                        required
+                      />
+                      <VoiceInputButton 
+                        onTranscript={(text) => setVitalSigns({ ...vitalSigns, bloodPressure: text })}
+                      />
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="heartRate">Frequência Cardíaca (bpm) *</Label>
@@ -398,26 +420,36 @@ const Triage = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor="symptoms">Sintomas *</Label>
-                  <Textarea
-                    id="symptoms"
-                    placeholder="Descreva os sintomas apresentados pelo paciente..."
-                    value={clinicalData.symptoms}
-                    onChange={(e) => setClinicalData({ ...clinicalData, symptoms: e.target.value })}
-                    className={cn(isFieldInvalid(clinicalData.symptoms) && "border-destructive")}
-                    rows={4}
-                    required
-                  />
+                  <div className="flex gap-2 items-start">
+                    <Textarea
+                      id="symptoms"
+                      placeholder="Descreva os sintomas apresentados pelo paciente..."
+                      value={clinicalData.symptoms}
+                      onChange={(e) => setClinicalData({ ...clinicalData, symptoms: e.target.value })}
+                      className={cn(isFieldInvalid(clinicalData.symptoms) && "border-destructive")}
+                      rows={4}
+                      required
+                    />
+                    <VoiceInputButton 
+                      onTranscript={(text) => setClinicalData({ ...clinicalData, symptoms: text })}
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="observations">Observações</Label>
-                  <Textarea
-                    id="observations"
-                    placeholder="Informações adicionais relevantes..."
-                    value={clinicalData.observations}
-                    onChange={(e) => setClinicalData({ ...clinicalData, observations: e.target.value })}
-                    rows={3}
-                  />
+                  <div className="flex gap-2 items-start">
+                    <Textarea
+                      id="observations"
+                      placeholder="Informações adicionais relevantes..."
+                      value={clinicalData.observations}
+                      onChange={(e) => setClinicalData({ ...clinicalData, observations: e.target.value })}
+                      rows={3}
+                    />
+                    <VoiceInputButton 
+                      onTranscript={(text) => setClinicalData({ ...clinicalData, observations: text })}
+                    />
+                  </div>
                 </div>
 
                 {classifying && (

@@ -84,9 +84,8 @@ export const VoiceInputButton = ({ onTranscript, disabled }: VoiceInputButtonPro
       type="button"
       onClick={toggleListening}
       variant="outline"
-      size="icon"
       disabled={disabled}
-      className={isListening ? "bg-primary text-primary-foreground" : ""}
+      className={`gap-2 ${isListening ? "bg-primary text-primary-foreground" : ""}`}
       title={isListening ? "Parar gravação" : "Preencher por voz"}
     >
       {isListening ? (
@@ -94,6 +93,9 @@ export const VoiceInputButton = ({ onTranscript, disabled }: VoiceInputButtonPro
       ) : (
         <Mic className="h-4 w-4" />
       )}
+      <span className="text-sm whitespace-nowrap">
+        {isListening ? "Parar" : "Preencher por voz"}
+      </span>
     </Button>
   );
 };

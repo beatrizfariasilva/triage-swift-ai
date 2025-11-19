@@ -56,15 +56,17 @@ export const TextToSpeechButton = () => {
     <Button
       onClick={speakPageContent}
       variant="outline"
-      size="icon"
-      className="fixed bottom-4 right-4 z-50 h-12 w-12 rounded-full shadow-lg"
+      className="fixed bottom-4 right-4 z-50 rounded-full shadow-lg gap-2 px-4 py-2"
       title={isSpeaking ? "Parar leitura" : "Ler conteúdo da tela"}
     >
       {isSpeaking ? (
-        <VolumeX className="h-5 w-5" />
+        <VolumeX className="h-4 w-4" />
       ) : (
-        <Volume2 className="h-5 w-5" />
+        <Volume2 className="h-4 w-4" />
       )}
+      <span className="text-sm font-medium">
+        {isSpeaking ? "Parar" : "Audio-texto"}
+      </span>
     </Button>
   );
 };

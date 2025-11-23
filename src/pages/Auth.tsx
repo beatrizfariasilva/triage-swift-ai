@@ -7,10 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Activity } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TextToSpeechButton } from "@/components/TextToSpeechButton";
 import { VoiceInputButton } from "@/components/VoiceInputButton";
+import logoVertical from "@/assets/logo-vertical.png";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -90,7 +90,7 @@ const Auth = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <Activity className="h-12 w-12 text-primary" />
+            <img src={logoVertical} alt="TriageFlow Logo" className="h-20 w-auto" />
           </div>
           <CardTitle className="text-3xl font-bold">triageFlow</CardTitle>
           <CardDescription>Sistema Hospitalar de Triagem</CardDescription>

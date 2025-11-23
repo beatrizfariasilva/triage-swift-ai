@@ -18,8 +18,8 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 215 25% 15%;
 
-    /* Professional medical blue */
-    --primary: 210 80% 48%;
+    /* TriageFlow brand blue from palette */
+    --primary: 195 100% 45%;
     --primary-foreground: 0 0% 100%;
 
     /* Medical green accent */
@@ -39,7 +39,7 @@ All colors MUST be HSL.
 
     --border: 215 20% 88%;
     --input: 215 20% 90%;
-    --ring: 210 80% 48%;
+    --ring: 195 100% 45%;
 
     --radius: 0.75rem;
     
@@ -51,9 +51,9 @@ All colors MUST be HSL.
     --blue-non-urgent: 221 83% 53%;
     
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(210 80% 48%), hsl(210 70% 58%));
+    --gradient-primary: linear-gradient(135deg, hsl(195 100% 45%), hsl(195 90% 55%));
     --gradient-secondary: linear-gradient(135deg, hsl(150 60% 50%), hsl(150 55% 60%));
-    --gradient-hero: linear-gradient(135deg, hsl(210 80% 48%) 0%, hsl(150 60% 50%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(195 100% 45%) 0%, hsl(150 60% 50%) 100%);
     
     /* Shadows */
     --shadow-sm: 0 1px 2px 0 hsl(215 25% 15% / 0.05);
@@ -90,7 +90,7 @@ All colors MUST be HSL.
     --popover: 215 25% 15%;
     --popover-foreground: 210 20% 95%;
 
-    --primary: 210 80% 55%;
+    --primary: 195 100% 50%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 150 60% 45%;
@@ -107,7 +107,7 @@ All colors MUST be HSL.
 
     --border: 215 20% 25%;
     --input: 215 20% 22%;
-    --ring: 210 80% 55%;
+    --ring: 195 100% 50%;
     
     /* Manchester Protocol Colors */
     --red-emergency: 0 85% 60%;
@@ -116,9 +116,9 @@ All colors MUST be HSL.
     --green-low-urgent: 142 76% 36%;
     --blue-non-urgent: 221 83% 53%;
     
-    --gradient-primary: linear-gradient(135deg, hsl(210 80% 55%), hsl(210 70% 65%));
+    --gradient-primary: linear-gradient(135deg, hsl(195 100% 50%), hsl(195 90% 60%));
     --gradient-secondary: linear-gradient(135deg, hsl(150 60% 45%), hsl(150 55% 55%));
-    --gradient-hero: linear-gradient(135deg, hsl(210 80% 55%) 0%, hsl(150 60% 45%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(195 100% 50%) 0%, hsl(150 60% 45%) 100%);
     
     --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.2);
     --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.3);

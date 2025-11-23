@@ -9,6 +9,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, BarChart, Bar, XAxis,
 import { Footer } from "@/components/Footer";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from "@/components/ui/breadcrumb";
 import { TextToSpeechButton } from "@/components/TextToSpeechButton";
+import logoHorizontal from "@/assets/logo-horizontal.png";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -129,7 +130,7 @@ const AdminDashboard = () => {
       <header className="bg-card border-b border-border sticky top-0 z-10 shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Activity className="h-8 w-8 text-primary" />
+            <img src={logoHorizontal} alt="TriageFlow" className="h-8 w-auto" />
             <div>
               <h1 className="text-2xl font-bold text-foreground">triageFlow</h1>
               <p className="text-sm text-muted-foreground">Painel Administrativo</p>

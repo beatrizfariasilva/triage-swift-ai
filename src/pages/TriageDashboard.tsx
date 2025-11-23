@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
 import { Badge } from "@/components/ui/badge";
 import { TextToSpeechButton } from "@/components/TextToSpeechButton";
+import logoHorizontal from "@/assets/logo-horizontal.png";
 
 type TriageRecord = {
   id: string;
@@ -194,7 +195,7 @@ const TriageDashboard = () => {
       <header className="bg-card border-b border-border sticky top-0 z-10 shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Activity className="h-8 w-8 text-primary" />
+            <img src={logoHorizontal} alt="TriageFlow" className="h-8 w-auto" />
             <div>
               <h1 className="text-2xl font-bold text-foreground">triageFlow</h1>
               <p className="text-sm text-muted-foreground">Painel de Triagem</p>

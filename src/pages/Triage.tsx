@@ -8,13 +8,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Activity, ArrowLeft, Undo2, Redo2 } from "lucide-react";
+import { ArrowLeft, Undo2, Redo2 } from "lucide-react";
 import { useFormHistory } from "@/hooks/useFormHistory";
 import { Footer } from "@/components/Footer";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
 import { cn } from "@/lib/utils";
 import { TextToSpeechButton } from "@/components/TextToSpeechButton";
 import { VoiceInputButton } from "@/components/VoiceInputButton";
+import logoVertical from "@/assets/logo-vertical.png";
 
 const Triage = () => {
   const navigate = useNavigate();
@@ -228,9 +229,7 @@ const Triage = () => {
                 >
                   <ArrowLeft className="h-5 w-5" />
                 </Button>
-                <div className="p-3 bg-gradient-primary rounded-full">
-                  <Activity className="h-8 w-8 text-primary-foreground" />
-                </div>
+                <img src={logoVertical} alt="TriageFlow" className="h-12 w-auto" />
               </div>
               <div className="flex gap-2">
                 <Button
